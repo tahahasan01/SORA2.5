@@ -20,6 +20,7 @@ export interface SoraRequest {
 export interface OsoRequirement {
   oso_number: number
   title: string
+  category: string | null
   robustness: 'O' | 'L' | 'M' | 'H'
 }
 

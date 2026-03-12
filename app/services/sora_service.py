@@ -181,6 +181,7 @@ class SoraService:
             select(
                 OsoCatalogue.oso_number,
                 OsoCatalogue.title,
+                OsoCatalogue.category,
                 OsoSailRequirement.robustness,
             )
             .join(OsoSailRequirement, OsoSailRequirement.oso_id == OsoCatalogue.id)
@@ -192,7 +193,7 @@ class SoraService:
         )
         result = await self.db.execute(stmt)
         return [
-            OsoRequirement(oso_number=r[0], title=r[1], robustness=r[2])
+            OsoRequirement(oso_number=r[0], title=r[1], category=r[2], robustness=r[3])
             for r in result.all()
         ]
 

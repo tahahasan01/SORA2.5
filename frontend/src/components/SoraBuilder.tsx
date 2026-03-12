@@ -80,6 +80,14 @@ const PROP_OPTIONS = ['electric', 'combustion', 'hybrid'] as const
 const FREQ_OPTIONS = ['rare', 'occasional', 'frequent'] as const
 const OPS_OPTIONS = ['VLOS', 'BVLOS', 'extended_VLOS'] as const
 
+function categoryStyle(cat: string | null) {
+  const c = (cat ?? '').toLowerCase()
+  if (c === 'technical') return { cls: 'bg-emerald-500/15 text-emerald-500 dark:text-emerald-400 border border-emerald-500/30', label: 'Technical' }
+  if (c === 'human') return { cls: 'bg-amber-500/15 text-amber-600 dark:text-amber-400 border border-amber-500/30', label: 'Human Factors' }
+  if (c === 'operational') return { cls: 'bg-sky-500/15 text-sky-600 dark:text-sky-400 border border-sky-500/30', label: 'Operator' }
+  return { cls: 'bg-slate-500/15 text-slate-500 border border-slate-500/20', label: cat ?? '—' }
+}
+
 function robustnessColor(level: string) {
   const l = level.toLowerCase()
   if (l === 'optional' || l === 'o') return 'bg-slate-500/30 text-slate-300 border border-slate-500/20'
@@ -433,6 +441,7 @@ export default function SoraBuilder({ onToast }: { onToast: (msg: string, type: 
                         <tr className="text-xs text-slate-500 border-b border-slate-200 dark:border-white/5 bg-slate-50 dark:bg-white/[0.02]">
                           <th className="text-left py-3 px-5 font-semibold">#</th>
                           <th className="text-left py-3 pr-3 font-semibold">Objective</th>
+                          <th className="text-left py-3 px-3 font-semibold">Category</th>
                           <th className="text-center py-3 px-5 font-semibold">Level</th>
                         </tr>
                       </thead>
@@ -441,8 +450,13 @@ export default function SoraBuilder({ onToast }: { onToast: (msg: string, type: 
                           <motion.tr key={i} initial={{ opacity: 0, x: -10 }}
                             animate={{ opacity: 1, x: 0 }} transition={{ delay: i * 0.03 }}
                             className="border-b border-slate-100 dark:border-white/[0.03] hover:bg-slate-50 dark:hover:bg-white/[0.03] transition-colors">
-                            <td className="py-3 px-5 text-sm text-slate-500 font-mono">{oso.oso_number}</td>
+                            <td className="py-3 px-5 text-sm text-slate-500 font-mono">OSO #{oso.oso_number}</td>
                             <td className="py-3 pr-3 text-sm text-slate-600 dark:text-slate-300">{oso.title}</td>
+                            <td className="py-3 px-3">
+                              <span className={`inline-block px-2.5 py-1 rounded-md text-[11px] font-semibold uppercase tracking-wide ${categoryStyle(oso.category).cls}`}>
+                                {categoryStyle(oso.category).label}
+                              </span>
+                            </td>
                             <td className="py-3 px-5 text-center">
                               <span className={`inline-block px-3 py-1 rounded-full text-xs font-bold ${robustnessColor(oso.robustness)}`}>
                                 {robustnessLabel(oso.robustness)}

@@ -60,6 +60,7 @@ class SoraCalculateRequest(BaseModel):
 class OsoRequirement(BaseModel):
     oso_number: int
     title: str
+    category: str | None = None
     robustness: str = Field(..., description="O / L / M / H")
 
 
