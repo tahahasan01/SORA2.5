@@ -1,4 +1,35 @@
-# DroneComply — EASA SORA 2.5 Compliance Platform
+<div align="center">
+
+# DroneComply
+### EASA SORA 2.5 Compliance Platform
+
+**Full-stack drone risk assessment tool — SORA 2.5 Builder + Design Maturity Assessment**
+
+<!-- Language / Runtime -->
+![Python](https://img.shields.io/badge/Python-3.12-3776AB?style=flat-square&logo=python&logoColor=white)
+![TypeScript](https://img.shields.io/badge/TypeScript-5.6-3178C6?style=flat-square&logo=typescript&logoColor=white)
+![Node.js](https://img.shields.io/badge/Node.js-22-339933?style=flat-square&logo=nodedotjs&logoColor=white)
+
+<!-- Backend -->
+![FastAPI](https://img.shields.io/badge/FastAPI-0.110-009688?style=flat-square&logo=fastapi&logoColor=white)
+![SQLAlchemy](https://img.shields.io/badge/SQLAlchemy-2.0-D71F00?style=flat-square&logo=sqlalchemy&logoColor=white)
+![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16.4-4169E1?style=flat-square&logo=postgresql&logoColor=white)
+![Pydantic](https://img.shields.io/badge/Pydantic-v2-E92063?style=flat-square&logo=pydantic&logoColor=white)
+
+<!-- Frontend -->
+![React](https://img.shields.io/badge/React-18.3-61DAFB?style=flat-square&logo=react&logoColor=black)
+![Vite](https://img.shields.io/badge/Vite-6.0-646CFF?style=flat-square&logo=vite&logoColor=white)
+![TailwindCSS](https://img.shields.io/badge/Tailwind_CSS-3.4-06B6D4?style=flat-square&logo=tailwindcss&logoColor=white)
+![Framer Motion](https://img.shields.io/badge/Framer_Motion-11.0-0055FF?style=flat-square&logo=framer&logoColor=white)
+![Three.js](https://img.shields.io/badge/Three.js-r160-000000?style=flat-square&logo=threedotjs&logoColor=white)
+
+<!-- Regulatory -->
+![EASA SORA](https://img.shields.io/badge/EASA-SORA_2.5-0033A0?style=flat-square)
+![License](https://img.shields.io/badge/License-MIT-22C55E?style=flat-square)
+
+</div>
+
+---
 
 A full-stack drone regulatory compliance platform implementing the **EASA SORA 2.5** (Specific Operations Risk Assessment) methodology and a **Design Maturity Assessment (DMA)** module. All regulatory values — GRC matrix, SAIL matrix, 17 OSOs, country rules — live in PostgreSQL with zero hardcoded thresholds in application code.
 
