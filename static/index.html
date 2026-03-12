@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Drone Compliance Platform</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/static/style.css" />
+</head>
+<body>
+
+<!-- ═══════════ 3D CANVAS (Three.js background) ═══════════ -->
+<canvas id="bg-canvas"></canvas>
+
+<!-- ═══════════ PARTICLE OVERLAY ═══════════ -->
+<div class="particles" id="particles"></div>
+
+<!-- ═══════════ NAVBAR ═══════════ -->
+<nav class="navbar glass">
+  <div class="nav-brand">
+    <div class="brand-icon">
+      <svg viewBox="0 0 32 32" fill="none"><path d="M16 2L4 9v14l12 7 12-7V9L16 2z" stroke="currentColor" stroke-width="1.5" fill="none"/><path d="M16 8l-6 3.5v7L16 22l6-3.5v-7L16 8z" fill="currentColor" opacity="0.2"/><circle cx="16" cy="15" r="3" fill="currentColor"/></svg>
+    </div>
+    <span class="brand-text">DRONE<span class="brand-accent">COMPLY</span></span>
+  </div>
+  <div class="nav-tabs">
+    <button class="nav-tab active" data-tab="sora">
+      <svg viewBox="0 0 20 20" fill="currentColor" width="16" height="16"><path d="M10 2a1 1 0 011 1v1.323l3.954 1.582 1.599-.8a1 1 0 01.894 1.79l-1.233.616 1.738 5.42a1 1 0 01-.285 1.05A3.989 3.989 0 0115 15a3.989 3.989 0 01-2.667-1.019 1 1 0 01-.285-1.05l1.715-5.349L11 6.477V16h2a1 1 0 110 2H7a1 1 0 110-2h2V6.477L6.237 7.582l1.715 5.349a1 1 0 01-.285 1.05A3.989 3.989 0 015 15a3.989 3.989 0 01-2.667-1.019 1 1 0 01-.285-1.05l1.738-5.42-1.233-.617a1 1 0 01.894-1.789l1.599.799L9 4.323V3a1 1 0 011-1z"/></svg>
+      SORA 2.5 Builder
+    </button>
+    <button class="nav-tab" data-tab="dma">
+      <svg viewBox="0 0 20 20" fill="currentColor" width="16" height="16"><path d="M2 11a1 1 0 011-1h2a1 1 0 011 1v5a1 1 0 01-1 1H3a1 1 0 01-1-1v-5zm6-4a1 1 0 011-1h2a1 1 0 011 1v9a1 1 0 01-1 1H9a1 1 0 01-1-1V7zm6-3a1 1 0 011-1h2a1 1 0 011 1v12a1 1 0 01-1 1h-2a1 1 0 01-1-1V4z"/></svg>
+      DMA Evaluator
+    </button>
+  </div>
+  <div class="nav-status">
+    <span class="status-dot" id="apiStatus"></span>
+    <span class="status-text" id="apiStatusText">Checking...</span>
+  </div>
+</nav>
+
+<!-- ═══════════ MAIN CONTENT ═══════════ -->
+<main class="main-content">
+
+  <!-- ── SORA TAB ─────────────────────────────────── -->
+  <section class="tab-panel active" id="panel-sora">
+    <div class="panel-header">
+      <div class="panel-title-group">
+        <h1 class="panel-title">SORA 2.5 Risk Assessment</h1>
+        <p class="panel-subtitle">Specific Operations Risk Assessment — EU Drone Regulatory Compliance</p>
+      </div>
+    </div>
+
+    <div class="content-grid">
+      <!-- LEFT: Form -->
+      <div class="form-card glass" id="soraFormCard">
+        <div class="card-header">
+          <h2 class="card-title">Drone Parameters</h2>
+          <div class="card-badge">Input</div>
+        </div>
+        <form id="soraForm" class="form-body">
+          <div class="form-grid">
+            <!-- MTOM -->
+            <div class="field-group">
+              <label class="field-label">
+                <span class="label-icon">⚖️</span>
+                Max Take-Off Mass
+              </label>
+              <div class="input-wrap">
+                <input type="number" id="mtom_grams" class="field-input" placeholder="e.g. 2000" min="1" step="any" required />
+                <span class="input-unit">grams</span>
+              </div>
+              <span class="field-hint">Total weight including payload</span>
+            </div>
+
+            <!-- Max Speed -->
+            <div class="field-group">
+              <label class="field-label">
+                <span class="label-icon">💨</span>
+                Max Speed
+              </label>
+              <div class="input-wrap">
+                <input type="number" id="max_speed_ms" class="field-input" placeholder="e.g. 25" min="0.1" step="any" required />
+                <span class="input-unit">m/s</span>
+              </div>
+              <span class="field-hint">Maximum operational speed</span>
+            </div>
+
+            <!-- Characteristic Dimension -->
+            <div class="field-group">
+              <label class="field-label">
+                <span class="label-icon">📐</span>
+                Characteristic Dimension
+              </label>
+              <div class="input-wrap">
+                <input type="number" id="characteristic_dimension_m" class="field-input" placeholder="e.g. 0.5" min="0.01" step="any" required />
+                <span class="input-unit">metres</span>
+              </div>
+              <span class="field-hint">Largest UA dimension</span>
+            </div>
+
+            <!-- Altitude -->
+            <div class="field-group">
+              <label class="field-label">
+                <span class="label-icon">🛫</span>
+                Flight Altitude (AGL)
+              </label>
+              <div class="input-wrap">
+                <input type="number" id="altitude_m" class="field-input" placeholder="e.g. 100" min="0" max="120" step="any" required />
+                <span class="input-unit">metres</span>
+              </div>
+              <span class="field-hint">Max 120 m above ground level</span>
+            </div>
+
+            <!-- Population Density -->
+            <div class="field-group full-width">
+              <label class="field-label">
+                <span class="label-icon">👥</span>
+                Population Density Band
+              </label>
+              <div class="radio-grid">
+                <label class="radio-card">
+                  <input type="radio" name="population_density_band" value="controlled_ground" />
+                  <div class="radio-card-body">
+                    <span class="radio-icon">🔒</span>
+                    <span class="radio-label">Controlled</span>
+                    <span class="radio-desc">Ground area</span>
+                  </div>
+                </label>
+                <label class="radio-card">
+                  <input type="radio" name="population_density_band" value="sparsely_populated" />
+                  <div class="radio-card-body">
+                    <span class="radio-icon">🌾</span>
+                    <span class="radio-label">Sparse</span>
+                    <span class="radio-desc">Rural area</span>
+                  </div>
+                </label>
+                <label class="radio-card">
+                  <input type="radio" name="population_density_band" value="populated" checked />
+                  <div class="radio-card-body">
+                    <span class="radio-icon">🏘️</span>
+                    <span class="radio-label">Populated</span>
+                    <span class="radio-desc">Urban area</span>
+                  </div>
+                </label>
+                <label class="radio-card">
+                  <input type="radio" name="population_density_band" value="gathering" />
+                  <div class="radio-card-body">
+                    <span class="radio-icon">🏟️</span>
+                    <span class="radio-label">Gathering</span>
+                    <span class="radio-desc">Dense crowd</span>
+                  </div>
+                </label>
+              </div>
+            </div>
+
+            <!-- ARC -->
+            <div class="field-group">
+              <label class="field-label">
+                <span class="label-icon">✈️</span>
+                Air Risk Class
+              </label>
+              <div class="select-wrap">
+                <select id="arc" class="field-input" required>
+                  <option value="ARC-a">ARC-a — Atypical airspace</option>
+                  <option value="ARC-b">ARC-b — Below 150 m, populated</option>
+                  <option value="ARC-c">ARC-c — Controlled airspace</option>
+                  <option value="ARC-d">ARC-d — Uncontrolled, above 150 m</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Country Code -->
+            <div class="field-group">
+              <label class="field-label">
+                <span class="label-icon">🌍</span>
+                Country Code
+                <span class="optional-badge">Optional</span>
+              </label>
+              <div class="input-wrap">
+                <input type="text" id="country_code" class="field-input" placeholder="e.g. DEU" maxlength="3" />
+                <span class="input-unit">ISO</span>
+              </div>
+              <span class="field-hint">3-letter ISO country code</span>
+            </div>
+          </div>
+
+          <button type="submit" class="btn-primary" id="soraSubmitBtn">
+            <span class="btn-content">
+              <svg viewBox="0 0 20 20" fill="currentColor" width="18" height="18"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-8.707l-3-3a1 1 0 00-1.414 1.414L10.586 9H7a1 1 0 100 2h3.586l-1.293 1.293a1 1 0 101.414 1.414l3-3a1 1 0 000-1.414z" clip-rule="evenodd"/></svg>
+              Run SORA Assessment
+            </span>
+            <span class="btn-loader">
+              <span class="spinner"></span> Processing...
+            </span>
+          </button>
+        </form>
+      </div>
+
+      <!-- RIGHT: Results -->
+      <div class="results-area" id="soraResults">
+        <div class="empty-state" id="soraEmptyState">
+          <div class="empty-drone">
+            <div class="drone-body">
+              <svg viewBox="0 0 120 80" fill="none">
+                <ellipse cx="60" cy="40" rx="20" ry="12" fill="currentColor" opacity="0.15" stroke="currentColor" stroke-width="1"/>
+                <line x1="40" y1="38" x2="15" y2="25" stroke="currentColor" stroke-width="1.5" opacity="0.6"/>
+                <line x1="80" y1="38" x2="105" y2="25" stroke="currentColor" stroke-width="1.5" opacity="0.6"/>
+                <line x1="45" y1="45" x2="20" y2="58" stroke="currentColor" stroke-width="1.5" opacity="0.6"/>
+                <line x1="75" y1="45" x2="100" y2="58" stroke="currentColor" stroke-width="1.5" opacity="0.6"/>
+                <circle cx="15" cy="25" r="8" stroke="currentColor" stroke-width="1" fill="none" opacity="0.4" class="prop p1"/>
+                <circle cx="105" cy="25" r="8" stroke="currentColor" stroke-width="1" fill="none" opacity="0.4" class="prop p2"/>
+                <circle cx="20" cy="58" r="8" stroke="currentColor" stroke-width="1" fill="none" opacity="0.4" class="prop p3"/>
+                <circle cx="100" cy="58" r="8" stroke="currentColor" stroke-width="1" fill="none" opacity="0.4" class="prop p4"/>
+                <circle cx="60" cy="40" r="4" fill="currentColor" opacity="0.5"/>
+              </svg>
+            </div>
+          </div>
+          <h3>Ready for Assessment</h3>
+          <p>Enter your drone parameters and run the SORA 2.5 analysis to see the risk classification results.</p>
+        </div>
+
+        <!-- Result Cards (hidden initially) -->
+        <div class="result-cards hidden" id="soraResultCards">
+          <!-- Top metrics row -->
+          <div class="metrics-row">
+            <div class="metric-card glass" id="metricBypass">
+              <div class="metric-icon bypass-icon">🛡️</div>
+              <div class="metric-body">
+                <span class="metric-label">Bypass Rule</span>
+                <span class="metric-value" id="valBypass">—</span>
+              </div>
+            </div>
+            <div class="metric-card glass" id="metricKE">
+              <div class="metric-icon ke-icon">⚡</div>
+              <div class="metric-body">
+                <span class="metric-label">Kinetic Energy</span>
+                <span class="metric-value" id="valKE">—</span>
+              </div>
+            </div>
+            <div class="metric-card glass" id="metricGRC">
+              <div class="metric-icon grc-icon">🎯</div>
+              <div class="metric-body">
+                <span class="metric-label">Ground Risk (iGRC)</span>
+                <span class="metric-value" id="valGRC">—</span>
+              </div>
+            </div>
+            <div class="metric-card glass" id="metricSAIL">
+              <div class="metric-icon sail-icon">⛵</div>
+              <div class="metric-body">
+                <span class="metric-label">SAIL Level</span>
+                <span class="metric-value" id="valSAIL">—</span>
+              </div>
+            </div>
+            <div class="metric-card glass" id="metricARC">
+              <div class="metric-icon arc-icon">✈️</div>
+              <div class="metric-body">
+                <span class="metric-label">Air Risk Class</span>
+                <span class="metric-value" id="valARC">—</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Risk gauge -->
+          <div class="gauge-card glass">
+            <h3 class="card-title">Risk Level Visualization</h3>
+            <div class="gauge-container">
+              <div class="gauge-bar">
+                <div class="gauge-fill" id="gaugeFill"></div>
+                <div class="gauge-marker" id="gaugeMarker"></div>
+              </div>
+              <div class="gauge-labels">
+                <span>Low</span><span>Medium</span><span>High</span><span>Very High</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- OSO Table -->
+          <div class="oso-card glass">
+            <div class="card-header">
+              <h3 class="card-title">OSO Requirements</h3>
+              <div class="card-badge" id="osoCount">0 OSOs</div>
+            </div>
+            <div class="oso-table-wrap">
+              <table class="oso-table">
+                <thead>
+                  <tr>
+                    <th>OSO #</th>
+                    <th>Title</th>
+                    <th>Robustness</th>
+                  </tr>
+                </thead>
+                <tbody id="osoTableBody"></tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Country Flags (if any) -->
+          <div class="country-card glass hidden" id="countryCard">
+            <div class="card-header">
+              <h3 class="card-title">Country-Specific Rules</h3>
+            </div>
+            <div id="countryFlags"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── DMA TAB ──────────────────────────────────── -->
+  <section class="tab-panel" id="panel-dma">
+    <div class="panel-header">
+      <div class="panel-title-group">
+        <h1 class="panel-title">DMA Maturity Evaluator</h1>
+        <p class="panel-subtitle">Digital Maturity Assessment — Evaluate organisational drone program readiness</p>
+      </div>
+    </div>
+
+    <div class="content-grid">
+      <!-- LEFT: Form -->
+      <div class="form-card glass">
+        <div class="card-header">
+          <h2 class="card-title">Evaluation Parameters</h2>
+          <div class="card-badge">Input</div>
+        </div>
+        <form id="dmaForm" class="form-body">
+          <div class="form-grid">
+            <div class="field-group full-width">
+              <label class="field-label">
+                <span class="label-icon">📊</span>
+                Dimension Name
+              </label>
+              <div class="input-wrap">
+                <input type="text" id="dma_dimension" class="field-input" placeholder="e.g. Operations" required />
+              </div>
+              <span class="field-hint">Assessment dimension to evaluate</span>
+            </div>
+
+            <div class="field-group full-width">
+              <label class="field-label">
+                <span class="label-icon">📝</span>
+                Question Scores
+              </label>
+              <div class="scores-editor" id="scoresEditor">
+                <div class="score-row">
+                  <input type="text" class="score-key field-input" placeholder="question_key" />
+                  <input type="number" class="score-value field-input" placeholder="score" min="0" step="any" />
+                  <button type="button" class="btn-icon btn-remove-score" title="Remove">✕</button>
+                </div>
+              </div>
+              <button type="button" class="btn-secondary" id="addScoreRow">
+                <svg viewBox="0 0 20 20" fill="currentColor" width="14" height="14"><path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd"/></svg>
+                Add Score Entry
+              </button>
+            </div>
+          </div>
+
+          <button type="submit" class="btn-primary" id="dmaSubmitBtn">
+            <span class="btn-content">
+              <svg viewBox="0 0 20 20" fill="currentColor" width="18" height="18"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-8.707l-3-3a1 1 0 00-1.414 1.414L10.586 9H7a1 1 0 100 2h3.586l-1.293 1.293a1 1 0 101.414 1.414l3-3a1 1 0 000-1.414z" clip-rule="evenodd"/></svg>
+              Evaluate Maturity
+            </span>
+            <span class="btn-loader">
+              <span class="spinner"></span> Processing...
+            </span>
+          </button>
+        </form>
+      </div>
+
+      <!-- RIGHT: Results -->
+      <div class="results-area" id="dmaResults">
+        <div class="empty-state" id="dmaEmptyState">
+          <div class="empty-chart">
+            <svg viewBox="0 0 120 80" fill="none">
+              <rect x="10" y="50" width="16" height="25" rx="3" fill="currentColor" opacity="0.15" stroke="currentColor" stroke-width="1"/>
+              <rect x="35" y="35" width="16" height="40" rx="3" fill="currentColor" opacity="0.2" stroke="currentColor" stroke-width="1"/>
+              <rect x="60" y="20" width="16" height="55" rx="3" fill="currentColor" opacity="0.3" stroke="currentColor" stroke-width="1"/>
+              <rect x="85" y="10" width="16" height="65" rx="3" fill="currentColor" opacity="0.4" stroke="currentColor" stroke-width="1"/>
+            </svg>
+          </div>
+          <h3>Ready for Evaluation</h3>
+          <p>Enter a dimension name and question scores to assess your drone program's digital maturity level.</p>
+        </div>
+
+        <div class="result-cards hidden" id="dmaResultCards">
+          <div class="metrics-row">
+            <div class="metric-card glass">
+              <div class="metric-icon">📊</div>
+              <div class="metric-body">
+                <span class="metric-label">Dimension</span>
+                <span class="metric-value" id="valDimension">—</span>
+              </div>
+            </div>
+            <div class="metric-card glass">
+              <div class="metric-icon">🎯</div>
+              <div class="metric-body">
+                <span class="metric-label">Maturity Level</span>
+                <span class="metric-value" id="valMaturityLevel">—</span>
+              </div>
+            </div>
+            <div class="metric-card glass">
+              <div class="metric-icon">🏷️</div>
+              <div class="metric-body">
+                <span class="metric-label">Maturity Label</span>
+                <span class="metric-value" id="valMaturityLabel">—</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Maturity gauge -->
+          <div class="gauge-card glass">
+            <h3 class="card-title">Maturity Score</h3>
+            <div class="maturity-visual">
+              <div class="maturity-ring-wrap">
+                <svg viewBox="0 0 140 140" class="maturity-ring">
+                  <circle cx="70" cy="70" r="60" stroke="rgba(255,255,255,0.08)" stroke-width="10" fill="none"/>
+                  <circle cx="70" cy="70" r="60" stroke="url(#matGrad)" stroke-width="10" fill="none" stroke-linecap="round" stroke-dasharray="377" stroke-dashoffset="377" id="maturityArc" transform="rotate(-90 70 70)"/>
+                  <defs><linearGradient id="matGrad" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#06b6d4"/><stop offset="100%" stop-color="#8b5cf6"/></linearGradient></defs>
+                </svg>
+                <div class="maturity-ring-center">
+                  <span class="maturity-pct" id="valPct">0%</span>
+                </div>
+              </div>
+              <div class="maturity-scores">
+                <div class="score-item">
+                  <span class="score-label">Raw Weighted</span>
+                  <span class="score-num" id="valRawScore">—</span>
+                </div>
+                <div class="score-item">
+                  <span class="score-label">Max Weighted</span>
+                  <span class="score-num" id="valMaxScore">—</span>
+                </div>
+                <div class="score-item">
+                  <span class="score-label">Normalised</span>
+                  <span class="score-num" id="valNormPct">—</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<!-- ═══════════ ERROR TOAST ═══════════ -->
+<div class="toast-container" id="toastContainer"></div>
+
+<!-- ═══════════ SCRIPTS ═══════════ -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="/static/app.js"></script>
+</body>
+</html>

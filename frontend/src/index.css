@@ -1,0 +1,97 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ── Global Styles ─────────────────────── */
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+}
+
+/* Light mode default */
+body { background: #f8f9fb; color: #1e293b; }
+/* Dark mode */
+.dark body { background: #080910; color: #e2e8f0; }
+
+::selection {
+  background: rgba(99, 102, 241, 0.25);
+  color: inherit;
+}
+
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.12); border-radius: 4px; }
+.dark ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.08); }
+::-webkit-scrollbar-thumb:hover { background: rgba(0,0,0,0.2); }
+.dark ::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.15); }
+
+/* ── Surfaces ── */
+.glass {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+}
+.dark .glass {
+  background: rgba(255, 255, 255, 0.025);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.glass-hover:hover {
+  background: #f8fafc;
+  border-color: #cbd5e1;
+}
+.dark .glass-hover:hover {
+  background: rgba(255, 255, 255, 0.04);
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+/* ── Text ── */
+.gradient-text {
+  color: #0f172a;
+}
+.dark .gradient-text {
+  color: #f1f5f9;
+  -webkit-text-fill-color: #f1f5f9;
+}
+
+.gradient-border {
+  position: relative;
+}
+.gradient-border::before {
+  display: none;
+}
+
+/* ── Buttons ── */
+.btn-shimmer {
+  position: relative;
+  overflow: hidden;
+}
+.btn-shimmer::after {
+  display: none;
+}
+
+/* ── Native <select> / <option> fix ── */
+select option {
+  background-color: #ffffff;
+  color: #1e293b;
+}
+.dark select option {
+  background-color: #0c0e18;
+  color: #e2e8f0;
+}
+.dark select option:checked {
+  background: rgba(99, 102, 241, 0.15);
+}
+
+/* ── Glow (muted) ── */
+.glow-emerald, .glow-cyan, .glow-amber, .glow-red {
+  box-shadow: none;
+}
+
+/* ── Pulse ring for SAIL badge ── */
+@keyframes pulse-ring {
+  0%   { box-shadow: 0 0 0 0 currentColor; }
+  70%  { box-shadow: 0 0 0 8px transparent; }
+  100% { box-shadow: 0 0 0 0 transparent; }
+}
+.animate-pulse-ring { animation: pulse-ring 2s ease-out infinite; }
