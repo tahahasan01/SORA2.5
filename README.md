@@ -321,6 +321,72 @@ UPDATE sora_versions SET is_active = true  WHERE version_label = '2.6';
 
 ---
 
+## Changelog
+
+| Commit | Description |
+|--------|-------------|
+| `3bc89cc` | Add framework badges and visual header to README |
+| `db4bf96` | Update README with full stack docs; add `.gitignore` |
+| `5a50b88` | Initial full-stack integration commit |
+
+### Development History
+
+**Round 1 — MVP Backend**
+- FastAPI async application scaffolded with SQLAlchemy 2.0 and asyncpg
+- PostgreSQL schema designed with `NUMRANGE` / `INT4RANGE` range types and `EXCLUDE USING gist` constraints
+- Real SORA 2.5 regulatory data seeded: GRC matrix, SAIL matrix, 17 OSOs, country rules
+- Pure Python `sora_engine.py` built with zero framework dependencies — all regulatory data injected via dataclasses
+- Pure Python `dma_scoring_engine.py` with weighted-average scoring and maturity-level mapping
+- 5 integration tests passing (250 g bypass, GRC lookup, SAIL III, 17 OSOs, 120 m limit)
+
+**Round 2 — Frontend Foundation**
+- React 18 + Vite 6 + TypeScript 5.6 project bootstrapped
+- Tailwind CSS 3.4 configured with custom color palette (navy, accent), Inter + JetBrains Mono fonts
+- Framer Motion 11 integrated for page transitions and animated results
+- Three.js + React Three Fiber 3D background scene (wireframe globe, orbit rings, quadcopter drone model, particle field)
+- Typed API client (`client.ts`) with full TypeScript interfaces for all request/response shapes
+
+**Round 3 — SORA Builder UI**
+- Full 5-column grid layout: 3-col form panel + 2-col results panel
+- 5 one-click presets (DJI Mini 3, DJI Mavic 3 Pro, Delivery Drone, Inspection Drone, Event Coverage) with auto-submit
+- Number fields for MTOM, max speed, dimension, altitude; select fields for ARC, operational scenario, mitigations
+- Population density selector with 4 illustrated option cards
+- Animated SAIL gauge bar, GRC reduction flow visualization, OSO table with robustness badges
+- Collapsible audit trail with step-by-step traceability and rule source references
+- Toast notification system (success/error, auto-dismiss)
+
+**Round 4 — DMA Module**
+- Multi-dimension questionnaire rendered from live API data (`GET /dma/questions`)
+- Per-dimension progress tracking with chip navigation and completion indicators
+- 1–5 scoring buttons with hover tooltips (Not Implemented → Optimized)
+- Animated SVG maturity ring chart with colour-coded glow effect
+- Dimension breakdown bar chart with Framer Motion staggered entry
+
+**Round 5 — `drone_type` Field**
+- Added `drone_type` to `SoraRequest` schema (Pydantic) and backend passthrough
+- Added `drone_type` to all 5 frontend presets with real model names
+- Drone model text input in the form; result hero card shows drone type badge
+
+**Round 6 — Bug Fixes & Label Improvements**
+- Fixed Air Risk display to show severity label alongside ARC class
+- Fixed OSO robustness levels showing full words (Optional/Low/Medium/High) instead of single letters
+- Verified and corrected all 5 preset drone specs against manufacturer data
+
+**Round 7 — UI Humanization**
+- Removed glass morphism, gradient text, shimmer buttons, glow effects, ALL-CAPS labels
+- Simplified Navbar; friendlier copy throughout all form sections
+- Replaced vibe-coded styles with clean, professional typography
+
+**Round 8 — Dark/Light Mode, Unit Toggle, Polish**
+- Removed Three.js 3D background from rendering — JS bundle reduced from 1,119 kB → 317 kB
+- Dark/light mode toggle (Sun/Moon icon in Navbar); preference persisted in `localStorage`; defaults to dark
+- Tailwind `darkMode: 'class'` strategy; all components updated with `dark:` prefix classes
+- Unit toggle in SORA form: switch between grams + m/s (SI) and kg + km/h — API always receives SI
+- Removed emoji icons from preset buttons; clean professional label-only cards
+- Full light-mode colour pass across `SoraBuilder`, `DmaEvaluator`, `Navbar`, and `App`
+
+---
+
 ## License
 
 MIT
