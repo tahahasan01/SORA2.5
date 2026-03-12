@@ -1,0 +1,26 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+*.egg
+
+# Environment
+.env
+venv/
+.venv/
+
+# Frontend
+frontend/node_modules/
+frontend/tsconfig.tsbuildinfo
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Build output is intentionally tracked (served by FastAPI)
+# static/dist/
