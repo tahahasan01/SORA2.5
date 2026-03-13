@@ -48,9 +48,15 @@ async def health_check():
 
 # ── Static files & SPA fallback ───────────────────────────────
 DIST_DIR = STATIC_DIR / "dist"
-app.mount("/assets", StaticFiles(directory=str(DIST_DIR / "assets")), name="assets")
+
+# In serverless deployments (e.g., Vercel API function), frontend assets are
+# typically served by the platform, so only mount local built assets if present.
+if (DIST_DIR / "assets").exists():
+    app.mount("/assets", StaticFiles(directory=str(DIST_DIR / "assets")), name="assets")
 
 
 @app.get("/", include_in_schema=False)
 async def serve_ui():
+    if not DIST_DIR.exists():
+        return {"message": "Frontend not bundled in this runtime. Use /docs for API."}
     return FileResponse(DIST_DIR / "index.html")
