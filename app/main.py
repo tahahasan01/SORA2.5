@@ -6,6 +6,7 @@ Run locally:  uvicorn app.main:app --reload
 """
 
 from contextlib import asynccontextmanager
+import os
 from pathlib import Path
 
 from fastapi import FastAPI
@@ -21,9 +22,12 @@ STATIC_DIR = Path(__file__).resolve().parent.parent / "static"
 
 @asynccontextmanager
 async def lifespan(application: FastAPI):
-    """Verify database connection on startup; dispose on shutdown."""
-    async with engine.connect() as conn:
-        await conn.execute(__import__("sqlalchemy").text("SELECT 1"))
+    """Manage startup/shutdown without hard-failing serverless cold starts."""
+    # On Vercel, failing startup makes every invocation return FUNCTION_INVOCATION_FAILED.
+    # We avoid hard-failing here; DB-dependent endpoints will still return clear errors.
+    if os.getenv("VERCEL") != "1":
+        async with engine.connect() as conn:
+            await conn.execute(__import__("sqlalchemy").text("SELECT 1"))
     yield
     await engine.dispose()
 
