@@ -3,26 +3,34 @@
   "installCommand": "npm install --prefix frontend",
   "buildCommand": "npm run build --prefix frontend",
   "outputDirectory": "frontend/dist",
-  "functions": {
-    "api/index.py": {
-      "runtime": "python3.12"
-    }
-  },
-  "routes": [
+  "rewrites": [
     {
-      "src": "/(sora|dma|health)(/.*)?",
-      "dest": "/api/index.py"
+      "source": "/sora/:path*",
+      "destination": "/api/index.py"
     },
     {
-      "src": "/(docs|redoc|openapi.json)$",
-      "dest": "/api/index.py"
+      "source": "/dma/:path*",
+      "destination": "/api/index.py"
     },
     {
-      "handle": "filesystem"
+      "source": "/health",
+      "destination": "/api/index.py"
     },
     {
-      "src": "/(.*)",
-      "dest": "/index.html"
+      "source": "/docs",
+      "destination": "/api/index.py"
+    },
+    {
+      "source": "/redoc",
+      "destination": "/api/index.py"
+    },
+    {
+      "source": "/openapi.json",
+      "destination": "/api/index.py"
+    },
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
     }
   ]
 }
